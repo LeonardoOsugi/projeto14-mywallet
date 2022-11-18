@@ -24,7 +24,7 @@ export default function FulanoPage(){
                                 <p>Nova<br/>Entrada</p>
                             </Entrada>
                         </Link>
-                        <Link to="newexit">
+                        <Link to="/newexit">
                             <Saida>
                                 <img src={mine} alt="mine"/>
                                 <p>Nova<br/>Saída</p>
