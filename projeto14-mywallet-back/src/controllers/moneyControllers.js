@@ -1,11 +1,8 @@
-import { db, moneySchema, collectionMoney, collectionUsuarios} from "../index.js";
+import {collectionMoney, collectionUsuarios, db} from "../database/db.js"
 
 export async function getMenu (req, res){
     const { authorization } = req.headers;
     const token = authorization?.replace("Bearer ", "");
-    if(!token){
-        return res.sendStatus(401);
-    }
     try{
         const session = await db.collection("sessions").findOne({token});
         const lista = await collectionMoney.find().toArray();
@@ -15,7 +12,8 @@ export async function getMenu (req, res){
         }
         delete user.senha;
         delete user.confirmSenha;
-        res.send({lista, user, token});
+        delete user.email;
+        res.send({lista, user});
     }catch(err){
         console.log(err);
         res.send(500);
@@ -26,13 +24,6 @@ export async function postEntrada (req, res){
     const {valor, descricao} = req.body;
 
     try{
-        const { error } = moneySchema.validate({valor, descricao},{abortEarly:false});
-
-        if(error){
-            const errors = error.details.map((detail) => detail.message);
-            return res.status(400).send(errors);
-        }
-
         await collectionMoney.insertOne({
             status: "entrada",
             valor,
@@ -49,12 +40,6 @@ export async function postSaida (req, res){
     const {valor, descricao} = req.body;
 
     try{
-        const { error } = moneySchema.validate({valor, descricao},{abortEarly:false});
-
-        if(error){
-            const errors = error.details.map((detail) => detail.message);
-            return res.status(400).send(errors);
-        }
 
         await collectionMoney.insertOne({
             status: "saída",
