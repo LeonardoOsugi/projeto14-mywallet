@@ -4,19 +4,52 @@ import VoltaLogin from "../assets/img/VoltaLogin.svg";
 import plus from "../assets/img/ant-design_plus-circle-outlined.svg";
 import mine from "../assets/img/ant-design_minus-circle-outlined.svg";
 import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { BASE_URL } from "../constants/urls";
+import EntradasSaidas from "../components/EntradasSaidas";
 
 export default function FulanoPage(){
+    const[listaMoney, setListaMoney] = useState([]);
+    const[saldoInit, setSaldoInit] = useState(2849.96);
+    const nome = JSON.parse(localStorage.getItem('name'));
+    const token = JSON.parse(localStorage.getItem('token'));
+
+    useEffect(() => {
+        axios.get(`${BASE_URL}menu`,{
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        }).then((res) =>{
+            setListaMoney(res.data);
+        }).catch((err) =>{
+            console.log(err.response.data);
+        });
+    },[]);
     return(
         <Tudo>
             <TerceiraPage>
                 <Corpo>
                     <Titulo>
-                        <h1>Olá, Fulano</h1>
+                        <h1>Olá, {nome}</h1>
                         <Link to="/">
                             <img src={VoltaLogin} alt="Volta-Login"/>
                         </Link>
                     </Titulo>
-                    <Lista></Lista>
+                    <Lista>
+                        {listaMoney.length === 0?(<div className="listavazia">Não há registros de<br/>
+                         entrada ou saída</div>)
+                         :
+                         (
+                            <ListaEntradaSaida>
+                                {listaMoney.map((i) => <EntradasSaidas key={i.id} status={i.status} valor={i.valor} descricao={i.descricao} setSaldoInit={setSaldoInit} saldoInit={saldoInit}/>)}
+                                <Saldo>
+                                    <p><strong>Saldo</strong></p>
+                                    <p className="saldoatual">{saldoInit}</p>
+                                </Saldo>
+                            </ListaEntradaSaida>
+                         )}
+                    </Lista>
                     <CaixaSomaSubtrai>
                         <Link to="/newenter">
                             <Entrada>
@@ -55,6 +88,12 @@ const Lista = styled.div`
     background-color: #ffffff;
     border-radius: 10px;
     margin-bottom: 10px;
+    .listavazia{
+        justify-content: center;
+        align-items: center;
+        font-family: 'Raleway';
+        font-size: 20px;
+    }
 `;
 
 const Titulo = styled.div`
@@ -113,5 +152,21 @@ const Saida = styled.div`
             font-family: 'Raleway';
             font-size: 17px;
             color: #ffffff;
+        }
+`;
+
+const ListaEntradaSaida = styled.div`
+        flex-wrap: wrap;
+`;
+
+const Saldo = styled.div`
+        flex-direction: row;
+        justify-content: space-around;
+        p{
+            font-family: "Raleway";
+            font-size: 17px;
+        }
+        .saldoatual{
+            color: "#03AC00";
         }
 `;

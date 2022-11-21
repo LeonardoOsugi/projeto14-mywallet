@@ -5,20 +5,51 @@ import { Inputs } from "../constants/styleInputs";
 import { ButtonSave } from "../constants/buttonSave";
 import { Link } from "react-router-dom";
 import { LinkTo } from "../constants/linkTo";
+import { useState } from "react";
+import { BASE_URL } from "../constants/urls";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+
 
 export default function CadastroPage(){
+    const[nome, setNome] = useState("");
+    const[email, setEmail] = useState("");
+    const[senha, setSenha] = useState("");
+    const[confirmSenha, setConfirmSenha] = useState("");
+    const navegate = useNavigate();
+
+    function addCadastro(e){
+    e.preventDefault();
+
+    const url = `${BASE_URL}cadastro`;
+
+    const body = {
+        nome: nome,
+        email: email,
+        senha: senha,
+        confirmSenha: confirmSenha,
+    };
+
+    axios.post(url,body).then(() => {
+        alert("Cadastro realizado");
+        navegate("/");
+      }).catch((err) => {
+        alert(err.response.data.message);
+      });
+    };
+
     return(
         <Tudo>
             <SegundaPage>
                 <ImgLogoCadastro>
                     <Logo/>
                 </ImgLogoCadastro>
-                <form onSubmit="">
+                <form onSubmit={addCadastro}>
                     <Inputs>
-                        <input name="name" type="text" placeholder="Nome"/>
-                        <input name="email" type="email" placeholder="E-mail"/>
-                        <input name="senha" type="password" placeholder="Senha"/>
-                        <input name="confirmSenha" type="password" placeholder="Confirme a senha"/>
+                        <input name="name" value={nome} type="text" placeholder="Nome" onChange={(e) => setNome(e.target.value)}/>
+                        <input name="email" value={email} type="email" placeholder="E-mail" onChange={(e) => setEmail(e.target.value)}/>
+                        <input name="senha" value={senha} type="password" placeholder="Senha" onChange={(e) => setSenha(e.target.value)}/>
+                        <input name="confirmSenha" value={confirmSenha} type="password" placeholder="Confirme a senha" onChange={(e) => setConfirmSenha(e.target.value)}/>
                     </Inputs>
                     <ButtonSave>
                         <button type="submit">Cadastrar</button>
